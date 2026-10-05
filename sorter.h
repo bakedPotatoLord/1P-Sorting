@@ -62,12 +62,16 @@ void sorter(std::vector<T> &items, std::size_t k) {
 	u32 subsetSize = size / 3;
 
 
-	vector<T> [] subsets = vector<T>[5];
-	// std::cout << midthird << " " << lastthird << endl;
+	vector<T>  subsets[5];
+	var it =items.begin();
 
-	// vector<T> items1(items.begin(), items.begin()+ midthird);
-	// vector<T> items2(items.begin()+ midthird, items.begin() + lastthird);
-	// vector<T> items3(items.begin() + lastthird, items.end());
+	for(u32 i = 0; i <k; i++){
+
+		subsets[i] = vector<T>(it,it+subsetSize);
+		it+= subsetSize;
+	}
+
+
 
 	// sorter(items1, k);
 	// sorter(items2, k);
@@ -77,18 +81,11 @@ void sorter(std::vector<T> &items, std::size_t k) {
 
 	items.clear();
 
-	// for( const auto& item: items1){
-	// 	std::cout << item << " ";
-	// }	
-	// std::cout << endl;
-	// for( const auto& item: items2){
-	// 	std::cout << item << " ";
-	// }	
-	// std::cout << endl;
-	// for( const auto& item: items3){
-	// 	std::cout << item << " ";
-	// }	
-	// std::cout << endl;
+for( const vector<T>& subset: subsets){
+	for( const auto& item: items1){
+		std::cout << item << " ";
+	}	
+}
 
 	for(u32 i =0u; i< k;i++){
 		//iterate over all sorted lists
