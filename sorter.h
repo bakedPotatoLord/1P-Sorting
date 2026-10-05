@@ -59,65 +59,41 @@ void sorter(std::vector<T> &items, std::size_t k) {
 		return;
 	}
 
-	u32 midthird = size / 3;
-	u32 lastthird = midthird << 1;
+	u32 subsetSize = size / 3;
 
+
+	vector<T> [] subsets = vector<T>[5];
 	// std::cout << midthird << " " << lastthird << endl;
 
-	vector<T> items1(items.begin(), items.begin()+ midthird);
-	vector<T> items2(items.begin()+ midthird, items.begin() + lastthird);
-	vector<T> items3(items.begin() + lastthird, items.end());
+	// vector<T> items1(items.begin(), items.begin()+ midthird);
+	// vector<T> items2(items.begin()+ midthird, items.begin() + lastthird);
+	// vector<T> items3(items.begin() + lastthird, items.end());
 
-	sorter(items1, k);
-	sorter(items2, k);
-	sorter(items3, k);
+	// sorter(items1, k);
+	// sorter(items2, k);
+	// sorter(items3, k);
 
 	//zipper merge
 
 	items.clear();
 
-	for( const auto& item: items1){
-		std::cout << item << " ";
-	}	
-	std::cout << endl;
-	for( const auto& item: items2){
-		std::cout << item << " ";
-	}	
-	std::cout << endl;
-	for( const auto& item: items3){
-		std::cout << item << " ";
-	}	
-	std::cout << endl;
+	// for( const auto& item: items1){
+	// 	std::cout << item << " ";
+	// }	
+	// std::cout << endl;
+	// for( const auto& item: items2){
+	// 	std::cout << item << " ";
+	// }	
+	// std::cout << endl;
+	// for( const auto& item: items3){
+	// 	std::cout << item << " ";
+	// }	
+	// std::cout << endl;
 
-	
-
-		// cout << "ooh"	<< items1.size() << " " << items2.size() << " " << items3.size() << endl;
-		// cout << items1.back() << " " << items2.back() << " " << items3.back() << endl;
-	
 	for(u32 i =0u; i< k;i++){
 		//iterate over all sorted lists
 		//find max entry at end
 
-		u32 index = 0u;
-		T max = items1.back();
-		if(items2.back() > max){
-			max = items2.back();
-			index = 1u;
-		}
-		if(items3.back() > max){
-			max = items3.back();
-			index = 2u;
-		}
-
-		items.push_back(max);
-		//remove max from appropriate list
-		if(index == 0u){
-			items1.pop_back();
-		}else if(index == 1u){
-			items2.pop_back();
-		}else{
-			items3.pop_back();
-		}
 	}
 
 }
