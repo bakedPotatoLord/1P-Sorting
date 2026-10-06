@@ -34,64 +34,66 @@
 template <class T>
 void sorter(std::vector<T> &items, std::size_t k) {  
 
-	using namespace std;
-	#define u32 u_int32_t 
+  using namespace std;
+  using u32 = u_int32_t;
 
-	if(k < 2){
-		return;
-	}
+  // Base cases
+  if (k < 2 || items.size() <= 1) {
+    return;
+  }
 
-	u32 size = items.size();
+  u32 size = items.size();
 
-	// std::cout << "size: " << size << endl;
+  if (size == 2) {
+    if (items[0] > items[1]) {
+      std::swap(items[0], items[1]);
+    }
+    return;
+  }
 
-	//handle base case
-	if(size == 2){
-		
-		
-		if(items[0] > items[1]){
-			//get the lesser on the LHS
-			std::swap(items[0], items[1]);
-		}
-		return;
-	}else if(size == 1){
-		//it's fine as-is
-		return;
-	}
+  // Calculate subset sizes
+  u32 subsetSize = size / k;
+  if (subsetSize == 0) {
+    // If vector elements < k,
+    subsetSize = 1;
+    k = size; 
+  }
 
-	u32 subsetSize = size / 3;
+  vector<vector<T>> subsets(k);
+  auto it = items.begin();
 
+  for (u32 i = 0; i < k; i++) {
+    // include all elements (expecially remainders)
+    auto next_it = (i == k - 1) ? items.end() : it + subsetSize;
+    subsets[i] = vector<T>(it, next_it);
+    it = next_it;
+  }
 
-	vector<T>  subsets[5];
-	var it =items.begin();
+  //sort sub-arrays
+  for (auto& subset : subsets) {
+    sorter(subset, k);
+  }
 
-	for(u32 i = 0; i <k; i++){
+  items.clear();
 
-		subsets[i] = vector<T>(it,it+subsetSize);
-		it+= subsetSize;
-	}
+  //3-way zipper Merge phase
+  for (u32 count = 0; count < size; count++) {
+    u32 minIndex = 0;
+    bool gotFirst = false;
 
+    for (u32 i = 0; i < k; i++) {
+      if (!subsets[i].empty()) {
+        if (!gotFirst || subsets[i].front() < subsets[minIndex].front()) {
+          gotFirst = true;
+          minIndex = i;
+        }
+      }
+    }
 
-
-	// sorter(items1, k);
-	// sorter(items2, k);
-	// sorter(items3, k);
-
-	//zipper merge
-
-	items.clear();
-
-for( const vector<T>& subset: subsets){
-	for( const auto& item: items1){
-		std::cout << item << " ";
-	}	
-}
-
-	for(u32 i =0u; i< k;i++){
-		//iterate over all sorted lists
-		//find max entry at end
-
-	}
-
+    if (gotFirst) {
+      items.push_back(subsets[minIndex].front());
+      subsets[minIndex].erase(subsets[minIndex].begin());
+    }
+  }
 }
 #endif
