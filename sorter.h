@@ -33,17 +33,21 @@
 
 template <class T>
 void sorter(std::vector<T> &items, std::size_t k) {  
-
-  using namespace std;
-  using u32 = u_int32_t;
-
-  // Base cases
-  if (k < 2 || items.size() <= 1) {
-    return;
-  }
+  using u32 = std::size_t;
 
   u32 size = items.size();
 
+  // Base cases
+  if (k < 2 || size <= 1) {
+    return;
+  }
+
+  // Optimize tree leaves: avoid creating empty subsets when vector size < k
+  if (size < k) {
+    k = size;
+  }
+
+  // Base case: small array sorting
   if (size == 2) {
     if (items[0] > items[1]) {
       std::swap(items[0], items[1]);
@@ -51,49 +55,52 @@ void sorter(std::vector<T> &items, std::size_t k) {
     return;
   }
 
-  // Calculate subset sizes
   u32 subsetSize = size / k;
-  if (subsetSize == 0) {
-    // If vector elements < k,
-    subsetSize = 1;
-    k = size; 
-  }
+  u32 remainder = size % k;
 
-  vector<vector<T>> subsets(k);
+  std::vector<std::vector<T>> subsets(k);
   auto it = items.begin();
 
+  // Divide items into k subsets using range constructor
   for (u32 i = 0; i < k; i++) {
-    // include all elements (expecially remainders)
-    auto next_it = (i == k - 1) ? items.end() : it + subsetSize;
-    subsets[i] = vector<T>(it, next_it);
+    // Distribute remainder elements evenly across the first few subsets
+    u32 currentSubsetSize = subsetSize + (i < remainder ? 1 : 0);
+    auto next_it = it + currentSubsetSize;
+    
+    subsets[i] = std::vector<T>(it, next_it);
     it = next_it;
   }
 
-  //sort sub-arrays
+  // Recursive call on each subarray
   for (auto& subset : subsets) {
     sorter(subset, k);
   }
 
-  items.clear();
+  // Track the front index of each subset without doing expensive erase/pop operations
+  std::vector<u32> indices(k, 0);
 
-  //3-way zipper Merge phase
-  for (u32 count = 0; count < size; count++) {
-    u32 minIndex = 0;
-    bool gotFirst = false;
+  // Resize output vector once upfront to avoid push_back overhead
+  items.resize(size);
 
+  // Linear-scan k-way merge phase
+  for (u32 out_idx = 0; out_idx < size; out_idx++) {
+    u32 min_subset_idx = 0;
+    bool found = false;
+
+    // Scan all non-exhausted subsets to find the minimum element
     for (u32 i = 0; i < k; i++) {
-      if (!subsets[i].empty()) {
-        if (!gotFirst || subsets[i].front() < subsets[minIndex].front()) {
-          gotFirst = true;
-          minIndex = i;
+      if (indices[i] < subsets[i].size()) {
+        if (!found || subsets[i][indices[i]] < subsets[min_subset_idx][indices[min_subset_idx]]) {
+          min_subset_idx = i;
+          found = true;
         }
       }
     }
 
-    if (gotFirst) {
-      items.push_back(subsets[minIndex].front());
-      subsets[minIndex].erase(subsets[minIndex].begin());
-    }
+    // Place min element directly into pre-allocated slot and advance subset's index
+    items[out_idx] = subsets[min_subset_idx][indices[min_subset_idx]];
+    indices[min_subset_idx]++;
   }
 }
+
 #endif
